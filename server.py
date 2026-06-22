@@ -931,6 +931,7 @@ def submit_pending():
 def list_pending():
     """List pending submit requests for a canvas. For Codex to poll."""
     cid = _resolve_canvas()
+    print(f"[poll] Codex polling /api/pending for canvas={cid}")
     pending_dir = _page_dir(cid) / "_pending"
     if not pending_dir.exists():
         return jsonify({"canvas_id": cid, "items": []})

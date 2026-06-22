@@ -86,17 +86,22 @@ def _http(method: str, path: str, body: dict | None = None, *,
         headers["Content-Length"] = str(len(data))
 
     try:
+        print(f"[mcp] {method} {full_path}")
         conn = http.client.HTTPConnection(host, port, timeout=120)
         conn.request(method, full_path, body=data, headers=headers)
         resp = conn.getresponse()
         text = resp.read().decode("utf-8")
         conn.close()
         if resp.status >= 400:
+            print(f"[mcp] {method} {full_path} -> HTTP {resp.status}")
             return {"error": f"http_{resp.status}", "detail": text[:500]}
+        print(f"[mcp] {method} {full_path} -> OK")
         return json.loads(text)
     except (ConnectionRefusedError, http.client.HTTPException, OSError) as e:
+        print(f"[mcp] {method} {full_path} -> unreachable: {e}")
         return {"error": "prompt_canvas_unreachable", "detail": str(e), "base_url": BASE_URL}
     except json.JSONDecodeError as e:
+        print(f"[mcp] {method} {full_path} -> bad_json: {e}")
         return {"error": "bad_json", "detail": str(e)}
 
 
